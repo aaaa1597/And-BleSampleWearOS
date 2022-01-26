@@ -1,5 +1,6 @@
 package asia.groovelab.blesample;
 
+import java.util.Arrays;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,21 +12,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.Arrays;
-
 import asia.groovelab.blesample.model.Peripheral;
+import static asia.groovelab.blesample.CentralPeripheralActivity.PERIPHERAL_EXTRA;
 
 public class CentralActivity extends AppCompatActivity {
 	private final static int	REQUEST_PERMISSIONS			= 1111;
@@ -45,7 +42,7 @@ public class CentralActivity extends AppCompatActivity {
 		lvw.setOnItemClickListener((adapterView, view, pos, l) -> {
 			Peripheral peripheral = viewModel.getPeripheral(pos);
 			Intent intent = new Intent(CentralActivity.this, CentralPeripheralActivity.class);
-			intent.putExtra("peripheral", peripheral);
+			intent.putExtra(PERIPHERAL_EXTRA, peripheral);
 			startActivity(intent);
 		});
 

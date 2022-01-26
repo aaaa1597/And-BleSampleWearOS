@@ -4,7 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/activity_central.xml" value="0.31929347826086957" />
+        <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/activity_central_peripheral.xml" value="0.338768115942029" />
         <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/activity_main.xml" value="0.4015625" />
+        <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/group_row.xml" value="0.338768115942029" />
+        <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/row_child.xml" value="0.338768115942029" />
         <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/layout/view_peripheral.xml" value="0.31929347826086957" />
         <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/menu/menu_central.xml" value="0.409375" />
         <entry key="..\:/OwnBiz/Uws/BLETrusted/BleSample3/app/src/main/res/menu/menu_central_peripheral.xml" value="0.409375" />
