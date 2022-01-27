@@ -4,5 +4,8 @@ And-BleSampleのWearOS用
 
 Nordic社製のライブラリを使用して作り直した。
 
-Peripheralは、下記コードのまんま。
+Centralは、下記コードをJava版に変更。<br/>
+https://github.com/groovelab/AndroidBleSample.git
+
+Peripheralは、下記コードのまんま。<br/>
 https://github.com/Apri1221/AppSensor.git
