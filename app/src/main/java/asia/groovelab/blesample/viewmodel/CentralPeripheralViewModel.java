@@ -70,6 +70,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 		bleManager.setConnectionObserver(new ConnectionObserver() {
 			@Override
 			public void onDeviceReady(@NonNull BluetoothDevice device) {
+				TLog.d("");
 				bleManager.readRssi(dbm -> {
 					rssi.postValue(dbm + "dbm");
 					return null;
@@ -171,12 +172,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 	public void disconnect(Func0<Object> doneHandler) {
 		progressBarVisibility.postValue(View.VISIBLE);
 
-		bleManager.enqueueDisconnect(() -> { new Handler().postDelayed(new Runnable() {
-												@Override
-												public void run() {
-													doneHandler.invoke();
-												}
-											}, 200);
+		bleManager.enqueueDisconnect(() -> { new Handler().postDelayed(() -> doneHandler.invoke(), 200);
 											return null;
 		});
 	}
@@ -185,19 +181,16 @@ public class CentralPeripheralViewModel extends ViewModel {
 		if (!item.getIsReadable())
 			return;
 
-		bleManager.readCharacteristic(item.getBluetoothGattCharacteristic(), new Func1<Data,Object>() {
-			@Override
-			public Object invoke(Data data) {
-				if(data != null && data.getValue() != null) {
-					byte[] readValue = data.getValue();
-					Item litem = getItem(item.getBluetoothGattCharacteristic());
-					if(litem != null) {
-						litem.setReadValue(Arrays.toString(readValue));
-						mAdapter.notifyDataSetChanged();
-					}
+		bleManager.readCharacteristic(item.getBluetoothGattCharacteristic(), (Func1<Data, Object>) data -> {
+			if(data != null && data.getValue() != null) {
+				byte[] readValue = data.getValue();
+				Item litem = getItem(item.getBluetoothGattCharacteristic());
+				if(litem != null) {
+					litem.setReadValue(Arrays.toString(readValue));
+					mAdapter.notifyDataSetChanged();
 				}
-				return null;
 			}
+			return null;
 		});
 	}
 
