@@ -90,12 +90,11 @@ public class CentralPeripheralViewModel extends ViewModel {
 
 				if (bleManager.wasConnected()) {
 					TLog.d("");
-					disconnect(new Func0() {
-						@Override
-						public Object invoke() {
-							disconnectedFromDevice.postValue(true);
-							return null;
-						}});
+					disconnect(() -> {
+						TLog.e("");
+						disconnectedFromDevice.postValue(true);
+						return null;
+					});
 				}
 			}
 
@@ -116,7 +115,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 				mAdapter.setSections(sectionList);
 
 				/* TODO ここから */
-				TLog.d("aaaaaaaaaaa TopLevel Service.size()={0}->{0} 同じはず。", services.size(), sectionList.size());
+				TLog.d("TopLevel Service.size()={0}", services.size());
 				int lpct = 0;
 				for(Section section : sectionList) {
 					TLog.d("{0}:{1}", lpct, section.getTitle());
@@ -142,9 +141,9 @@ public class CentralPeripheralViewModel extends ViewModel {
 				mAdapter.setItems(itemList);
 
 				/* TODO ここから */
-				TLog.d("aaaaaaaaaaa itemList.size()={0}", itemList.size());
+				TLog.d("itemList.size()={0}", itemList.size());
 				for(List<Item> items : itemList) {
-					TLog.d("aaaaaaaaaaa items.size()={0}", items.size());
+					TLog.d("items.size()={0}", items.size());
 					for(Item item : items)
 						TLog.d("{0}:{1} {2} {3} {4}", item.getUuid(), item.getIsReadable(), item.getIsWritable(), item.getBluetoothGattCharacteristic(), item.getReadValue());
 				}
@@ -172,17 +171,13 @@ public class CentralPeripheralViewModel extends ViewModel {
 	public void disconnect(Func0<Object> doneHandler) {
 		progressBarVisibility.postValue(View.VISIBLE);
 
-		bleManager.enqueueDisconnect(new Func0<Object>() {
-			@Override
-			public Object invoke() {
-				new Handler().postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						doneHandler.invoke();
-					}
-				}, 200);
-				return null;
-			}
+		bleManager.enqueueDisconnect(() -> { new Handler().postDelayed(new Runnable() {
+												@Override
+												public void run() {
+													doneHandler.invoke();
+												}
+											}, 200);
+											return null;
 		});
 	}
 

@@ -40,14 +40,14 @@ public class CentralViewModel  extends ViewModel {
 	private ScanCallback scanCallback = new ScanCallback() {
 		@Override
 		public void onScanResult(int callbackType, @NonNull ScanResult result) {
-			TLog.d("aaaaaaaaaaa ScanResult={0}", result);
+			TLog.d("ScanResult={0}", result);
 			addPeripheral(new Peripheral(result));
 			mUpdlist.postValue(true);
 		}
 
 		@Override
 		public void onBatchScanResults(@NonNull List<ScanResult> results) {
-			TLog.d("aaaaaaaaaaa ScanResults={0}", results);
+			TLog.d("ScanResults={0}", results);
 			if(results.size()==0) return;
 			List<Peripheral> peripherals = results.stream().map(it -> new Peripheral(it)).collect(Collectors.toList());
 			addPeripherals(peripherals);

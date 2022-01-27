@@ -103,6 +103,7 @@ public class CentralPeripheralActivity extends AppCompatActivity {
 
 	private void disconnectedAndDismiss() {
 		viewModel.disconnect(() -> {
+			TLog.e("");
 			finish();
 			return null;
 		});

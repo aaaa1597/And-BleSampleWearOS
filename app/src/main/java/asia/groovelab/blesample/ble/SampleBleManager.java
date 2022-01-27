@@ -81,11 +81,13 @@ public class SampleBleManager extends BleManager {
 		this.mWasConnected = false;
 		this.disconnect().done(new SuccessCallback() {
 			public final void onRequestCompleted(@NonNull BluetoothDevice it) {
+				TLog.d("");
 				if (doneHandler != null)
 					doneHandler.invoke();
 			}
 		}).fail(new FailCallback() {
 			public final void onRequestFailed(@NonNull BluetoothDevice $noName_0, int $noName_1) {
+				TLog.d("");
 				if (doneHandler != null)
 					doneHandler.invoke();
 
