@@ -68,7 +68,7 @@ public class Item implements Parcelable {
 	public BluetoothGattCharacteristic getBluetoothGattCharacteristic() { return bluetoothGattCharacteristic; }
 	public String	getReadValue() { return readValue; }
 	public void		setReadValue(String str) { readValue = str; }
-	public int getReadableColorRes() { return (isReadable)  ? R.color.colorTextNormal : R.color.colorTextDisabled; }
-	public int getWritableColorRes() { return (isWritable)  ? R.color.colorTextNormal : R.color.colorTextDisabled; }
-	public int getNotifiableColorRes(){return (isNotifiable)? R.color.colorTextNormal : R.color.colorTextDisabled; }
+	public int getReadableColorRes() { return (isReadable)  ? 0xff00ff00 : R.color.colorTextDisabled; }
+	public int getWritableColorRes() { return (isWritable)  ? 0xff00ff00 : R.color.colorTextDisabled; }
+	public int getNotifiableColorRes(){return (isNotifiable)? 0xff00ff00 : R.color.colorTextDisabled; }
 }
