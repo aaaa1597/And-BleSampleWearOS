@@ -70,12 +70,9 @@ public class CentralPeripheralViewModel extends ViewModel {
 		bleManager.setConnectionObserver(new ConnectionObserver() {
 			@Override
 			public void onDeviceReady(@NonNull BluetoothDevice device) {
-				bleManager.readRssi(new Func1<Integer, Object>() {
-					@Override
-					public Object invoke(Integer o) {
-						rssi.postValue(o + "dbm");
-						return null;
-					}
+				bleManager.readRssi(dbm -> {
+					rssi.postValue(dbm + "dbm");
+					return null;
 				});
 			}
 

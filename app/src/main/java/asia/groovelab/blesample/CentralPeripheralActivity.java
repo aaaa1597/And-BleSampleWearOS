@@ -133,7 +133,7 @@ public class CentralPeripheralActivity extends AppCompatActivity {
 		}});
 
 		AlertDialog diag = new AlertDialog.Builder(this)
-				.setMessage("Write to [${item.uuid}]")
+				.setMessage(MessageFormat.format("Write to {0}\n 0-9a-fを入力してください。", item.getUuid()))
 				.setView(editText)
 				.setPositiveButton("Write", (dialogInterface, i) -> {
 					viewModel.writeCharacteristic(item, editText.getText().toString());
