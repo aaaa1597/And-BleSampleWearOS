@@ -40,14 +40,14 @@ public class CentralViewModel  extends ViewModel {
 	private ScanCallback scanCallback = new ScanCallback() {
 		@Override
 		public void onScanResult(int callbackType, @NonNull ScanResult result) {
-			Tlog.d("aaaaaaaaaaa ScanResult={0}", result);
+			TLog.d("aaaaaaaaaaa ScanResult={0}", result);
 			addPeripheral(new Peripheral(result));
 			mUpdlist.postValue(true);
 		}
 
 		@Override
 		public void onBatchScanResults(@NonNull List<ScanResult> results) {
-			Tlog.d("aaaaaaaaaaa ScanResults={0}", results);
+			TLog.d("aaaaaaaaaaa ScanResults={0}", results);
 			if(results.size()==0) return;
 			List<Peripheral> peripherals = results.stream().map(it -> new Peripheral(it)).collect(Collectors.toList());
 			addPeripherals(peripherals);
@@ -82,7 +82,7 @@ public class CentralViewModel  extends ViewModel {
 		if(isScanning)
 			return;
 
-		Tlog.d("aaaaaaaaaaa startScan");
+		TLog.d("aaaaaaaaaaa startScan");
 		getScanner().startScan(null, getScanSetting(), scanCallback);
 		isScanning = true;
 	}
@@ -91,7 +91,7 @@ public class CentralViewModel  extends ViewModel {
 		if (!isScanning)
 			return;
 
-		Tlog.d("aaaaaaaaaaa stopScan");
+		TLog.d("aaaaaaaaaaa stopScan");
 		getScanner().stopScan(scanCallback);
 		isScanning = false;
 	}

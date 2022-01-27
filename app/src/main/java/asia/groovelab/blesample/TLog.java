@@ -4,7 +4,7 @@ import android.util.Log;
 
 import java.text.MessageFormat;
 
-public class Tlog {
+public class TLog {
 	public static void d(String logstr) {
 		StackTraceElement throwableStackTraceElement = new Throwable().getStackTrace()[1];
 		String head = MessageFormat.format("{0}::{1}({2})", throwableStackTraceElement.getClassName(), throwableStackTraceElement.getMethodName(), throwableStackTraceElement.getLineNumber());

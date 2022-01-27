@@ -7,10 +7,13 @@ import android.text.Spanned;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -33,7 +36,8 @@ public class CentralPeripheralActivity extends AppCompatActivity {
 		viewModel = new ViewModelProvider(this).get(CentralPeripheralViewModel.class);
 		viewModel.setContext(this);
 		ExpandableListView elv = findViewById(R.id.exlist_view);
-		elv.setAdapter(new ItemListAdapter(this));
+		viewModel.setAdapter(new ItemListAdapter(this));
+		elv.setAdapter(viewModel.getAdapter());
 		elv.setOnGroupClickListener((expandableListView, view, grpidx, id) -> true);
 		elv.setOnChildClickListener((elView, view, grpidx, childidx, id) -> {
 			Item item = viewModel.getItem(grpidx, childidx);
@@ -67,6 +71,18 @@ public class CentralPeripheralActivity extends AppCompatActivity {
 				Toast.makeText(this, showstr, Toast.LENGTH_LONG).show();
 			}
 			return null;
+		});
+		viewModel.getAppTitle().observe(this, apptitle -> {
+			((Toolbar)findViewById(R.id.toolbar)).setTitle(apptitle);
+		});
+		viewModel.getAddress().observe(this, address -> {
+			((TextView)findViewById(R.id.address_text_view)).setText(address);
+		});
+		viewModel.getRssi().observe(this, rssi -> {
+			((TextView)findViewById(R.id.rssi_text_view)).setText(rssi);
+		});
+		viewModel.getProgressBarVisibility().observe(this, visibility -> {
+			findViewById(R.id.progress_bar).setVisibility(visibility);
 		});
 
 		(findViewById(R.id.disconnect_button)).setOnClickListener(view -> {

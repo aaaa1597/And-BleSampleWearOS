@@ -4,21 +4,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ExpandableListView;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+
+import asia.groovelab.blesample.R;
+import asia.groovelab.blesample.adapter.ItemListAdapter;
 import no.nordicsemi.android.ble.data.Data;
 import no.nordicsemi.android.ble.observer.BondingObserver;
 import no.nordicsemi.android.ble.observer.ConnectionObserver;
 
-import asia.groovelab.blesample.Tlog;
+import asia.groovelab.blesample.TLog;
 import asia.groovelab.blesample.ble.SampleBleManager;
 import asia.groovelab.blesample.Functions.Func0;
 import asia.groovelab.blesample.Functions.Func1;
@@ -31,23 +40,32 @@ public class CentralPeripheralViewModel extends ViewModel {
 	private Peripheral			peripheral = null;
 	private SampleBleManager	bleManager;
 
-	private MutableLiveData<String>				appTitle = new MutableLiveData<>();
-	private MutableLiveData<String>				address = new MutableLiveData<>();
-	private MutableLiveData<String>				rssi = new MutableLiveData<>();
-	private MutableLiveData<List<Section>>		sections = new MutableLiveData<>();
-	private MutableLiveData<List<List<Item>>>	items = new MutableLiveData<>();
-	private MutableLiveData<Integer>			progressBarVisibility = new MutableLiveData<>();
+	private MutableLiveData<String>		appTitle = new MutableLiveData<>();
+	public MutableLiveData<String>		getAppTitle() { return appTitle; }
+	private MutableLiveData<String>		address = new MutableLiveData<>();
+	public MutableLiveData<String>		getAddress() { return address; }
+	private MutableLiveData<String>		rssi = new MutableLiveData<>();
+	public MutableLiveData<String>		getRssi() { return rssi; }
+	private MutableLiveData<Integer>	progressBarVisibility = new MutableLiveData<>();
+	public MutableLiveData<Integer>		getProgressBarVisibility() { return progressBarVisibility; }
+	private MutableLiveData<Boolean>	reconnected = new MutableLiveData<>();
+	public MutableLiveData<Boolean>		getReconnected() { return reconnected; }
+	private MutableLiveData<Boolean>	disconnectedFromDevice = new MutableLiveData<>();
+	public MutableLiveData<Boolean>		getDisconnectedFromDevice() { return disconnectedFromDevice; }
+	private MutableLiveData<Boolean>	notifyDataSetChanged = new MutableLiveData<>();
+	private Func2<UUID, byte[], Object>	wroteCharacteristicHandler = null;
+	public void							setWroteCharacteristicHandler(Func2<UUID, byte[], Object> func) { wroteCharacteristicHandler = func; }
+	private Func2<UUID, byte[], Integer>notifiedCharacteristicHandler = null;
+	public void							setNotifiedCharacteristicHandler(Func2<UUID, byte[], Integer> func) { notifiedCharacteristicHandler = func; }
 
-	private MutableLiveData<Boolean> reconnected = new MutableLiveData<>();
-	public MutableLiveData<Boolean> getReconnected() { return reconnected; }
-	private MutableLiveData<Boolean> disconnectedFromDevice = new MutableLiveData<>();
-	public MutableLiveData<Boolean> getDisconnectedFromDevice() { return disconnectedFromDevice; }
-	private Func2<UUID, byte[], Object> wroteCharacteristicHandler = null;
-	public void setWroteCharacteristicHandler(Func2<UUID, byte[], Object> func) { wroteCharacteristicHandler = func; }
-	private Func2<UUID, byte[], Integer> notifiedCharacteristicHandler = null;
-	public void setNotifiedCharacteristicHandler(Func2<UUID, byte[], Integer> func) { notifiedCharacteristicHandler = func; }
-
-	public void setContext(Context context) {
+	public void setContext(AppCompatActivity context) {
+		notifyDataSetChanged.observe(context, ignore ->
+				context.runOnUiThread(() -> {
+					ExpandableListView evw = context.findViewById(R.id.exlist_view);
+					for(int lpct = 0; lpct < evw.getExpandableListAdapter().getGroupCount(); lpct++)
+						evw.expandGroup(lpct);
+					mAdapter.notifyDataSetChanged();
+		}));
 		bleManager = new SampleBleManager(context);
 		bleManager.setConnectionObserver(new ConnectionObserver() {
 			@Override
@@ -63,8 +81,9 @@ public class CentralPeripheralViewModel extends ViewModel {
 
 			@Override
 			public void onDeviceConnected(@NonNull BluetoothDevice device) {
-				Tlog.d("");
+				TLog.d("");
 				if (bleManager.isConnecting()) {
+					TLog.d("");
 					if(peripheral == null) return;
 					BluetoothDevice dev = peripheral.getBluetoothDevice();
 					reconnected.postValue(true);
@@ -73,6 +92,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 				}
 
 				if (bleManager.wasConnected()) {
+					TLog.d("");
 					disconnect(new Func0() {
 						@Override
 						public Object invoke() {
@@ -82,10 +102,10 @@ public class CentralPeripheralViewModel extends ViewModel {
 				}
 			}
 
-			@Override public void onDeviceConnecting(@NonNull BluetoothDevice device) { Tlog.d(""); }
-			@Override public void onDeviceFailedToConnect(@NonNull BluetoothDevice device, int reason) { Tlog.d(""); }
-			@Override public void onDeviceDisconnecting(@NonNull BluetoothDevice device) { Tlog.d(""); }
-			@Override public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) { Tlog.d(""); }
+			@Override public void onDeviceConnecting(@NonNull BluetoothDevice device) { TLog.d(""); }
+			@Override public void onDeviceFailedToConnect(@NonNull BluetoothDevice device, int reason) { TLog.d(""); }
+			@Override public void onDeviceDisconnecting(@NonNull BluetoothDevice device) { TLog.d(""); }
+			@Override public void onDeviceDisconnected(@NonNull BluetoothDevice device, int reason) { TLog.d(""); }
 		});
 		bleManager.setBondingObserver(new BondingObserver() {
 			@Override public void onBondingRequired(@NonNull BluetoothDevice device) { }
@@ -96,7 +116,16 @@ public class CentralPeripheralViewModel extends ViewModel {
 			@Override
 			public Object invoke(List<BluetoothGattService> services) {
 				List<Section> sectionList = services.stream().map(it -> new Section(it)).collect(Collectors.toList());
-				sections.postValue(sectionList);
+				mAdapter.setSections(sectionList);
+
+				/* TODO ここから */
+				TLog.d("aaaaaaaaaaa TopLevel Service.size()={0}->{0} 同じはず。", services.size(), sectionList.size());
+				int lpct = 0;
+				for(Section section : sectionList) {
+					TLog.d("{0}:{1}", lpct, section.getTitle());
+					lpct++;
+				}
+				/* ここまで */
 
 				List<List<Item>> itemList = services.stream().map(
 					service -> service.getCharacteristics().stream().map(
@@ -113,7 +142,18 @@ public class CentralPeripheralViewModel extends ViewModel {
 							}
 					).collect(Collectors.toList())
 				).collect(Collectors.toList());
-				items.postValue(itemList);
+				mAdapter.setItems(itemList);
+
+				/* TODO ここから */
+				TLog.d("aaaaaaaaaaa itemList.size()={0}", itemList.size());
+				for(List<Item> items : itemList) {
+					TLog.d("aaaaaaaaaaa items.size()={0}", items.size());
+					for(Item item : items)
+						TLog.d("{0}:{1} {2} {3} {4}", item.getUuid(), item.getIsReadable(), item.getIsWritable(), item.getBluetoothGattCharacteristic(), item.getReadValue());
+				}
+				/* ここまで */
+
+				notifyDataSetChanged.postValue(true);
 				progressBarVisibility.postValue(View.GONE);
 				return null;
 			}
@@ -121,6 +161,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 	}
 
 	public void connect(Peripheral peripheral) {
+		TLog.d("");
 		appTitle.postValue(peripheral.getLocalName());
 		address.postValue(peripheral.getAddress());
 		progressBarVisibility.postValue(View.VISIBLE);
@@ -160,7 +201,7 @@ public class CentralPeripheralViewModel extends ViewModel {
 					Item litem = getItem(item.getBluetoothGattCharacteristic());
 					if(litem != null) {
 						litem.setReadValue(Arrays.toString(readValue));
-						items.postValue(items.getValue());
+						mAdapter.notifyDataSetChanged();
 					}
 				}
 				return null;
@@ -193,19 +234,25 @@ public class CentralPeripheralViewModel extends ViewModel {
 	}
 
 	public Item getItem(Integer sectionPosition, Integer itemPosition) {
-		if(items.getValue() == null || items.getValue().get(sectionPosition) == null)
+		if(mAdapter.getItems().get(sectionPosition) == null)
 			return null;
-		return items.getValue().get(sectionPosition).get(itemPosition);
+		return mAdapter.getItems().get(sectionPosition).get(itemPosition);
 	}
 
 	private Item getItem(BluetoothGattCharacteristic characteristic) {
-		if(items == null || items.getValue() == null)
-			return null;
-		for(List<Item> item : items.getValue()) {
+		for(List<Item> item : mAdapter.getItems()) {
 			Item findit = item.stream().filter(it -> it.getUuid().equals(characteristic.getUuid().toString())).findAny().orElse(null);
 			if(findit != null)
 				return findit;
 		}
 		return null;
+	}
+
+	private ItemListAdapter mAdapter;
+	public void setAdapter(ItemListAdapter adapter) {
+		this.mAdapter = adapter;
+	}
+	public ItemListAdapter getAdapter() {
+		return mAdapter;
 	}
 }

@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+import asia.groovelab.blesample.TLog;
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.callback.DataReceivedCallback;
 import no.nordicsemi.android.ble.callback.DataSentCallback;
@@ -41,6 +42,7 @@ public class SampleBleManager extends BleManager {
 	private class SampleBleManagerGattCallback extends BleManagerGattCallback {
 		@Override
 		protected boolean isRequiredServiceSupported(@NonNull BluetoothGatt gatt) {
+			TLog.d("");
 			mIsConnecting = false;
 			mWasConnected = true;
 			if(discoveredServicesHandler != null)
@@ -50,6 +52,7 @@ public class SampleBleManager extends BleManager {
 
 		@Override
 		protected void onDeviceDisconnected() {
+			TLog.d("");
 		}
 	}
 
@@ -67,11 +70,13 @@ public class SampleBleManager extends BleManager {
 	}
 
 	public final void enqueueConnect(@NonNull BluetoothDevice bluetoothDevice) {
+		TLog.d("");
 		this.mIsConnecting = true;
 		connect(bluetoothDevice).timeout(connectionTimeout*1000).retry(3, (int)connectionRetryDelay).enqueue();
 	}
 
 	public final void enqueueDisconnect(@Nullable final Func0<Object> doneHandler) {
+		TLog.d("");
 		this.mIsConnecting = false;
 		this.mWasConnected = false;
 		this.disconnect().done(new SuccessCallback() {
@@ -89,6 +94,7 @@ public class SampleBleManager extends BleManager {
 	}
 
 	public void readRssi(@NonNull final Func1<Integer, Object> callback) {
+		TLog.d("");
 		this.readRssi().with(new RssiCallback() {
 			public final void onRssiRead(@NonNull BluetoothDevice device, int rssi) {
 				callback.invoke(rssi);
@@ -97,6 +103,7 @@ public class SampleBleManager extends BleManager {
 	}
 
 	public void readCharacteristic(@NonNull BluetoothGattCharacteristic characteristic, @NonNull final Func1 callback) {
+		TLog.d("");
 		this.readCharacteristic(characteristic).with(new DataReceivedCallback() {
 			public final void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
 				callback.invoke(data);
@@ -105,6 +112,7 @@ public class SampleBleManager extends BleManager {
 	}
 
 	public final void writeCharacteristic(@NonNull BluetoothGattCharacteristic characteristic, @NonNull Data writeData, @NonNull final Func1 callback) {
+		TLog.d("");
 		this.writeCharacteristic(characteristic, writeData).with(new DataSentCallback() {
 			public final void onDataSent(@NonNull BluetoothDevice device, @NonNull Data data) {
 				callback.invoke(data);
@@ -113,6 +121,7 @@ public class SampleBleManager extends BleManager {
 	}
 
 	public final void enableNotificationCallBack(@NonNull BluetoothGattCharacteristic characteristic, @NonNull final Func1<Data, Object> callback) {
+		TLog.d("");
 		this.setNotificationCallback(characteristic).with(new DataReceivedCallback() {
 			public final void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
 				callback.invoke(data);

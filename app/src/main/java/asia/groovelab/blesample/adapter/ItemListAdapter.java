@@ -18,6 +18,10 @@ public class ItemListAdapter extends BaseExpandableListAdapter {
 	private LayoutInflater mInflater;
 	private List<Section> sections = new ArrayList<>();
 	private List<List<Item>> items = new ArrayList<>();
+	public void setSections(List<Section> sections) { this.sections = sections; }
+	public List<Section> getSections() { return sections; }
+	public void setItems(List<List<Item>> items) { this.items = items; }
+	public List<List<Item>> getItems() { return items; }
 
 	public ItemListAdapter(Context context) {
 		mInflater = LayoutInflater.from(context);
@@ -36,7 +40,7 @@ public class ItemListAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getGroupView(int grppos, boolean isExpanded, View view, ViewGroup parent) {
 		if(view == null)
-			view = mInflater.inflate(R.layout.row_group, parent, true);
+			view = mInflater.inflate(R.layout.row_group, parent, false);
 
 		TextView textview = view.findViewById(R.id.title_text_view);
 		textview.setText(sections.get(grppos).getTitle());
@@ -59,7 +63,7 @@ public class ItemListAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getChildView(int grpidx, int childidx, boolean isExpanded, View view, ViewGroup parent) {
 		if(view == null)
-			view = mInflater.inflate(R.layout.row_child, parent, true);
+			view = mInflater.inflate(R.layout.row_child, parent, false);
 
 		Item item = items.get(grpidx).get(childidx);
 		((TextView)view.findViewById(R.id.uuid_text_view)).setText(item.getUuid());
